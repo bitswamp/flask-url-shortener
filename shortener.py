@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 from os import path
 from peewee import *
 import sqlite3
@@ -32,6 +32,8 @@ def shorten():
     if format == "html":
         flash(new_url)
         return redirect(url_for("index", _external = True, _scheme = "https"))
+    elif format == "json":
+        return jsonify(url = new_url)
 
     return new_url
 
