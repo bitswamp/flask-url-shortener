@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}
+    bitswa.mp url shortener
+{% endblock %}
+{% block body %}
+
+<section class="measure">
+    <div class="grd">
+        <div class="grd-row">
+            <div class="grd-row-col-6">
+                <h1 class="h2">bitswa.mp url shortener</h1>
+
+                <form method="get" action="{{ url_for("shorten")  }}">
+                    <label for="url">URL</label>
+                    <input type="text" id="url" name="url" value="" placeholder="http://example.com" />
+                    <label for="token">Auth Token (optional)</label>
+                    <input type="text" id="token" name="token" value="" />
+
+                    <input type="hidden" id="format" name="format" value="html" />
+
+                    <input type="submit" class="btn btn--blue" value="Shorten" />
+                </form>
+
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <p class="urls bg--off-white p1">
+                        Your short url:
+                        {% for message in messages %}
+                        <a href="{{ message }}">{{ message }}</a>
+                        {% endfor %}
+                        </p>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
