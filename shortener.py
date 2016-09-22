@@ -1,5 +1,6 @@
 from flask import Flask, Markup
 from flask import flash, jsonify, redirect, render_template, request, url_for
+from flask import send_from_directory
 from os import path
 from peewee import SqliteDatabase, Model, PrimaryKeyField, CharField
 import short_url
@@ -43,6 +44,9 @@ def shorten():
 
 @app.route("/<slug>")
 def unshorten(slug):
+    if path.isfile(path.join("static", slug)):
+        return send_from_directory("static", slug)
+
     id = short_url.decode_url(slug)
     url = Url.get(Url.id == id)
     return redirect(url.url)
