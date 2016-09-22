@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Markup
 from flask import flash, jsonify, redirect, render_template, request, url_for
 from os import path
 from peewee import SqliteDatabase, Model, PrimaryKeyField, CharField
@@ -32,7 +32,8 @@ def shorten():
     print(new_url)
 
     if format == "html":
-        flash(new_url)
+        template = Markup(render_template("new_url.html", new_url=new_url))
+        flash(template)
         return redirect(url_for("index", _external=True, _scheme="https"))
     elif format == "json":
         return jsonify(url=new_url)

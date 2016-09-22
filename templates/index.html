@@ -22,14 +22,9 @@
                 </form>
 
                 {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        <p class="urls bg--off-white p1">
-                        Your short url:
-                        {% for message in messages %}
-                        <a href="{{ message }}">{{ message }}</a>
-                        {% endfor %}
-                        </p>
-                    {% endif %}
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
                 {% endwith %}
             </div>
         </div>
