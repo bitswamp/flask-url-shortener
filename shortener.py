@@ -5,6 +5,8 @@ from flask import abort, send_from_directory
 from os import path
 from peewee import SqliteDatabase, Model
 from peewee import PrimaryKeyField, CharField, BooleanField, DateTimeField
+
+from models import Url, Token, Ip
 import short_url
 
 # routes
@@ -55,7 +57,7 @@ def shorten():
 
 
 def rate_limit_exceeded(ip, token):
-    Ip.delete().where(Ip.time < datetime.now() + timedelta(hours=-1))
+    Ip.delete().where(Ip.time < datetime.now() + timedelta(hours=-1)).execute()
     count = Ip.select().where(Ip.ip == ip).count()
     print(ip + " - " + str(count))
     return count >= URLS_PER_IP_PER_HOUR;
@@ -80,48 +82,28 @@ def unshorten(slug):
         # invalid url or not found
         abort(404)
 
-# database
-
 urls = SqliteDatabase("urls.db")
 auth = SqliteDatabase("auth.db")
 
-
-class Url(Model):
-    id = PrimaryKeyField()
-    url = CharField()
-    class Meta:
-        database = urls
-
-
-class Token(Model):
-    token = CharField()
-    valid = BooleanField()
-    class Meta:
-        database = auth
-
-
-class Ip(Model):
-    ip = CharField(index = True)
-    token = CharField(index = True)
-    time = DateTimeField(index = True)
-    class Meta:
-        database = auth
-
-
 def init_db():
     print("Checking for databases ...")
-    if path.isfile("urls.db") and path.isfile("auth.db"):
+    urls_db_exists = path.isfile("urls.db")
+    auth_db_exists = path.isfile("auth.db")
+    if urls_db_exists and auth_db_exists:
         print("Databases exist.")
         return
 
-    print("Creating urls database ...")
-    urls.connect()
-    urls.create_tables([Url])
+    if not urls_db_exists:
+        print("Creating urls database ...")
+        urls.connect()
+        urls.create_tables([Url])
 
-    print("Creating auth database ...")
-    auth.connect()
-    auth.create_tables([Token, Ip])
+    if not auth_db_exists:
+        print("Creating auth database ...")
+        auth.connect()
+        auth.create_tables([Token, Ip])
 
 if __name__ == "__main__":
     init_db()
     app.run()
+
